@@ -158,6 +158,7 @@ Write the SQL query that will include:
 ✅ A query using a WHERE clause.
 ✅ A query using ORDER BY.
 ✅ A query using LIMIT.
+
 This query shows Top 5 the most expensive orders from 2025-03-01, and shows information about that order.
 ```
 select b.Name as BodyguardName,
@@ -178,6 +179,7 @@ limit 5;
 <img width="915" height="162" alt="image" src="https://github.com/user-attachments/assets/b8f3ed57-1940-496a-8b90-efa00712ad07" />
 
 ✅ A query using CTE\CTEs.
+
 This query shows bodyguard total orders, their income and sortet by desc
 ```
 with count_cte as(
@@ -218,6 +220,7 @@ order by p.Cost desc;
 
 
 ✅ A query using GROUP BY and HAVING.
+
 This query shows Bodyguards who have sallary more tnan 300 for all period of their work.
 ```
 SELECT b.Name as BodyguardName,
