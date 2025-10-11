@@ -2,6 +2,9 @@
 Create 5 tables
 
 ```create table Service(
+use Assignment_01;
+
+create table Service(
 serviceID int not null primary key auto_increment,
 typeOfService Enum('VIP Protection level 1', 'VIP Protection level 2', 'Event Security', 'Corporate Security', 'Executive Protection'),
 description varchar(100),
