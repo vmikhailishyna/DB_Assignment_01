@@ -153,92 +153,51 @@ values
 ```
 
 Write the SQL query that will include:
-
 ✅ A SELECT query joining 5 tables.
-✅ A query using a WHERE clause.
-✅ A query using ORDER BY.
-✅ A query using LIMIT.
-
-This query shows Top 5 the most expensive orders from 2025-03-01, and shows information about that order.
-```
-select b.Name as BodyguardName,
-		b.Surname as BodyguardSurname,
-		s.TypeOfService,
-		c.Name as ClientName,
-		o.OrderID,
-		p.Cost
-from Orders o
-join Clients c on o.ClientID = c.ClientID
-join Bodyguard b on o.BodyguardID = b.BodyguardID
-join Service s on o.ServiceID = s.ServiceID
-join Price p on s.ServiceID = p.ServiceID
-where o.OrderDate > '2025-03-01'
-order by p.Cost desc
-limit 5;
-```
-<img width="915" height="162" alt="image" src="https://github.com/user-attachments/assets/b8f3ed57-1940-496a-8b90-efa00712ad07" />
-
 ✅ A query using CTE\CTEs.
+✅ A query using SUBQUERY.
+✅ A query using a WHERE clause.
+✅ A query using GROUP BY and HAVING.
+✅ A query using ORDER BY.
+✅ A query using LIMIT
 
-This query shows bodyguard total orders, their income and sortet by desc
 ```
-with count_cte as(
-select b.Name as BodyguardName,
-b.Surname as BodyguardSurname,
-Count(o.BodyguardID) as total_orders,
-SUM(p.Cost) AS total_income
-from Orders o
-join Bodyguard b on o.BodyguardID = b.BodyguardID
-JOIN Service s ON o.ServiceID = s.ServiceID
+calculation of the number of orders and income for bodyguards
+WITH count_cte AS (
+    SELECT 
+        b.BodyguardID,
+        b.Name AS BodyguardName,
+        b.Surname AS BodyguardSurname,
+        COUNT(o.OrderID) AS total_orders,
+        SUM(p.Cost) AS total_income
+    FROM Orders o
+    JOIN Bodyguard b ON o.BodyguardID = b.BodyguardID
+    JOIN Service s ON o.ServiceID = s.ServiceID
     JOIN Price p ON s.ServiceID = p.ServiceID
     GROUP BY b.BodyguardID, b.Name, b.Surname
+    HAVING SUM(p.Cost) > 300
 )
-select cte.BodyguardName,
-cte.BodyguardSurname,
-cte.total_orders,
-cte.total_income
-from count_cte cte
-order by cte.total_income DESC;
-```
-<img width="690" height="182" alt="image" src="https://github.com/user-attachments/assets/264580bd-41c3-4bf4-8ea3-c5c406b2e3ce" />
-
-
-✅ A query using SUBQUERY.
-```
-select o.OrderID,
-s.TypeOfService,
-p.Cost
-from Orders o
-join Service s on o.ServiceID = s.ServiceID
-join Price p on s.ServiceID = p.ServiceID
-where p.Cost >(
-select avg(Cost)
-from Price)
-order by p.Cost desc;
-```
-<img width="426" height="165" alt="image" src="https://github.com/user-attachments/assets/d0684aae-e08e-44aa-aee3-a6180109564a" />
-
-
-✅ A query using GROUP BY and HAVING.
-
-This query shows Bodyguards who have sallary more tnan 300 for all period of their work.
-```
-SELECT b.Name as BodyguardName,
-SUM(p.Cost) AS Sallary
+information about bodyguards and customers with expensive orders
+SELECT 
+    cte.BodyguardName,
+    cte.BodyguardSurname,
+    c.Name AS ClientName,
+    s.TypeOfService,
+    p.Cost AS ServiceCost,
+    cte.total_orders,
+    cte.total_income
 FROM Orders o
-join Bodyguard b on o.BodyguardID = b.BodyguardID
-join Service s on o.ServiceID = s.ServiceID
-join Price p on s.ServiceID = p.ServiceID
-GROUP BY b.BodyguardID 
-having Sallary > 300
-order by Sallary desc;
+JOIN Clients c ON o.ClientID = c.ClientID
+JOIN Bodyguard b ON o.BodyguardID = b.BodyguardID
+JOIN Service s ON o.ServiceID = s.ServiceID
+JOIN Price p ON s.ServiceID = p.ServiceID
+JOIN count_cte AS cte ON b.BodyguardID = cte.BodyguardID
+WHERE 
+    o.OrderDate > '2025-03-01'                        
+    AND p.Cost > (SELECT AVG(Cost) FROM Price)
+ORDER BY 
+    cte.total_income DESC 
+LIMIT 5;
 ```
-<img width="335" height="158" alt="image" src="https://github.com/user-attachments/assets/d7626018-7657-4463-afeb-6367062d7bd4" />
+<img width="1076" height="162" alt="image" src="https://github.com/user-attachments/assets/bd721309-c66b-4cdb-9f18-4fe7cb2c377f" />
 
-
-Use UNION or UNION ALL
-```
-select Name from Bodyguard
-union 
-select Name from clients;
-```
